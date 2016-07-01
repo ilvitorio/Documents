@@ -1,0 +1,34 @@
+function [wopt,score_eval] = objective_function(max_weights,min_weights,init_weights,ETF_series,portfolio_series) 
+        
+ 
+ %Defining the objective function of the optimization routine
+     function score=score_function(weights)
+        
+         ETF_portfolio_series=ETF_series*weights;
+         difference_series=portfolio_series-ETF_portfolio_series;
+         
+         % The Developement documents states that they do the following
+         %w_te=0.9;
+         %w_sdte=0.05;
+         %w_skew=0.025;
+         %w_kurtosis=0.025;
+         %score= w_te*sd(difference_series) 
+         %       + w_sdte*sd(sd(difference_series)) <-- Do they seek the
+         %       fourth momenth? 
+         %       + w_skew*skew(difference_series) 
+         %       + w_kurtosis*kurtosis(difference_series); 
+         
+         %This is stated in the code that they had provided
+         
+         score=std(difference_series);
+         
+     end
+ 
+    %Defining the optimization routine
+    options=optimset('fmincon');
+    options.MaxFunEvals=3000;
+    [wopt,score_eval]= ...
+        fmincon(@score_function,init_weights,[],[],ones(1,length(init_weights)),1,min_weights,max_weights,[],options); 
+
+     
+ end
